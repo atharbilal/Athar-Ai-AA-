@@ -1,37 +1,86 @@
-# Athar — The Digital Twin
+# ATHAR — Digital Twin
 
-A local AI mirror built to think, talk, and react exactly like I do. This isn't a generic chatbot; it’s a digital twin that understands the "matchbox" college life, the Japan exit plan, and the "invertebrate jellyfish" that make life dull.
+> *"built because time is precious and most people are not."*
 
-## 🧠 Core Philosophy
+---
 
-The "Athar" model operates on a few-shot personality engine. It doesn't just answer questions—it mimics my specific psychological edge:
-- **the dread:** total disgust for the NIT Srinagar environment.
-- **the exit:** laser-focused on financial independence and moving to Italy/Japan.
-- **the logic:** show don't tell. work in bursts. use AI to debug because time is precious.
-- **the vibe:** lowercase only, no emojis, dry humor, and zero patience for egoists.
+Athar is not a chatbot. It's a localized AI mirror — designed to think, talk, and react with a specific psychological edge. It understands the dread of a matchbox college, high-burst engineering logic, and the necessity of a Japan exit plan.
 
-## 🛠 Tech Stack
+---
 
-- **AI Engine:** [Ollama](https://ollama.com/) running `llama3.2` locally (100% private, no API keys).
-- **Backend:** Python + Flask.
-- **Frontend:** Minimalist Dark Mode UI with Neon Green accents.
-- **Context:** Hardcoded personality core and life-lore integrated directly into the prompt.
+## Philosophy
 
+| Vector | Reality |
+|---|---|
+| **The Dread** | Total disgust for the NIT Srinagar environment |
+| **The Exit** | Financial independence. Italy or Japan. No bragging, just autonomy |
+| **The Logic** | Show, don't tell. Work in bursts. AI-assisted because manual is prehistoric |
+| **The Vibe** | lowercase only. zero emojis. dry humor. zero patience for invertebrate jellyfish |
 
-# Clone the repository
-git clone [https://github.com/atharbilal/athar.git](https://github.com/atharbilal/athar.git)
+---
+
+## Tech Stack
+
+```
+Intelligence  →  Ollama / llama3.2   (100% local, zero latency, total privacy)
+Backend       →  Python + Flask       (the nervous system)
+Frontend      →  Neon-green dark UI   (the face)
+Memory        →  Hardcoded life-lore and behavioral context
+```
+
+---
+
+## Setup
+
+**1. Start the engine**
+
+```bash
+ollama pull llama3.2
+ollama serve
+```
+
+**2. Clone and install**
+
+```bash
+git clone https://github.com/atharbilal/athar.git
 cd athar
-
-# Create a virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
-
-# Install dependencies
+python3 -m venv .venv && source .venv/bin/activate
 pip install flask requests
+```
+
+**3. Run**
+
+```bash
 python app.py
+```
+
+Open `http://127.0.0.1:5000`
+
+---
+
+## Structure
+
+```
 athar/
-├── app.py             # The Entire Brain (Personality Logic + Server)
+├── app.py          # the brain — logic, personality, flask
 ├── static/
-│   └── index.html     # The UI (Dark/Neon)
-└── README.md          # Documentation
-*What’s the move now? Should I show you how to add a "Chat Log" feature so you can review what your digital twin says while you're asleep?**
+│   └── index.html  # the interface — neon dark UI
+└── README.md
+```
+
+---
+
+## Behavioral Protocols
+
+```
+LOWERCASE ONLY       →  no exceptions
+STAY REAL            →  smile on the outside, internally disgusted by incompetence  
+PUNCHY               →  if it fits in 5 words, don't use 10
+BRUTAL               →  if you're being a chomu, it will tell you
+```
+
+---
+
+## Status
+
+working locally. more to come, inshallah.
