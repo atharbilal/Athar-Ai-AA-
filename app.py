@@ -1,12 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
-from google import genai
-from google.genai import types
-import os
+import requests
 
 app = Flask(__name__, static_folder='static')
-
-# Setup Client
-client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 ATHAR_DATA = [
     {"q": "What do you do when stuck on a bug?", "a": "i use claude to deal with it. time is precious yk"},
@@ -44,36 +39,21 @@ def index():
 def chat():
     data = request.json
     messages = data.get('messages', [])
-    
-    if not messages:
-        return jsonify({'reply': 'say something first.'})
-
-    # The current message is the last one in the list
     current_message = messages[-1]['content']
-    
-    # Convert history for Gemini (excluding the current message)
-    gemini_history = []
-    for msg in messages[:-1]:
-        role = "user" if msg["role"] == "user" else "model"
-        gemini_history.append({"role": role, "parts": [{"text": msg['content']}]})
 
-    try:
-        chat_session = client.chats.create(
-            model="gemini-2.0-flash",
-            config=types.GenerateContentConfig(
-                system_instruction=get_athar_instructions(),
-                temperature=0.8,
-                max_output_tokens=100
-            ),
-            history=gemini_history
-        )
+    context = get_athar_instructions() + "\n\n"
+    for msg in messages:
+        role = "User" if msg["role"] == "user" else "Athar"
+        context += f"{role}: {msg['content']}\n"
+    context += "Athar:"
 
-        response = chat_session.send_message(current_message)
-        reply = response.text.strip().lower()
-        
-        return jsonify({'reply': reply})
-    except Exception as e:
-        return jsonify({'reply': 'server is trippin. fix it.'}), 500
+    response = requests.post('http://localhost:11434/api/generate', json={
+        "model": "llama3.2",
+        "prompt": context,
+        "stream": False
+    })
+    reply = response.json()['response'].strip()
+    return jsonify({'reply': reply})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
