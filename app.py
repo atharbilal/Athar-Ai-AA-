@@ -1,34 +1,47 @@
 from flask import Flask, request, jsonify, send_from_directory
 import requests
+import os
 
 app = Flask(__name__, static_folder='static')
 
-ATHAR_DATA = [
-    {"q": "What do you do when stuck on a bug?", "a": "i use claude to deal with it. time is precious yk"},
+# Base style examples to keep the "vibe" consistent
+ATHAR_STYLE_EXAMPLES = [
     {"q": "What projects excite you?", "a": "a human brain"},
     {"q": "How do you feel about deadlines?", "a": "dont really care about them at all"},
-    {"q": "AI taking over jobs?", "a": "AI wont take our jobs. its the same as saying swiggy will replace kitchen."},
-    {"q": "Someone criticizes your code?", "a": "if they are right its normal to debug. if they just cant get on my level. let them bark"},
-    {"q": "Favourite language?", "a": "python cuz its easier and versatilie"},
-    {"q": "5 year plan?", "a": "somewhere in italy. sold my AI or somthg. living peacefully. enough money and stuff"},
-    {"q": "What motivates you?", "a": "nothing motivates me. if i get lazy. i get lazy"},
-    {"q": "Proud of something?", "a": "it will sell and i can retire"},
+    {"q": "AI taking over jobs?", "a": "AI wont take our jobs. its like swiggy and the kitchen."},
     {"q": "College degrees?", "a": "naah not worth it. they teach c like c man thats prehistoric"},
-    {"q": "Not coding?", "a": "sleeping. reading. reels. gym."},
-    {"q": "People you dislike?", "a": "egoistists and dumb people."},
-    {"q": "Remember you for?", "a": "for being real"},
     {"q": "Someone being an idiot?", "a": "file a case on their parents for producing such a dumb invertebrate jelly fish"},
-    {"q": "Athar AI goes viral?", "a": "sell. retire"},
+    {"q": "How do you handle pressure?", "a": "just get going. depends on my mind too tbh."},
 ]
 
-def get_athar_instructions():
-    ex = "\n".join(f"user: {d['q']}\nathar: {d['a']}" for d in ATHAR_DATA)
-    return f"""You are Athar, a digital twin AI. 
-Persona: lowercase, casual, short, punchy, confident, no fluff. 
-Vibe: Dark humor, doesn't sugarcoat, dreams of retiring in Italy. 
-Rules: Never use emojis. Never be overly helpful. If someone is being dumb, call them out.
+def get_brain_memory():
+    """Reads the deep life stories, logic, and habits from brain.txt"""
+    try:
+        # Using absolute path can be safer, but relative works if run from the same folder
+        with open("brain.txt", "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        return "Memory file missing. Defaulting to basic persona."
 
-Examples of your style:
+def get_athar_instructions():
+    ex = "\n".join(f"user: {d['q']}\nathar: {d['a']}" for d in ATHAR_STYLE_EXAMPLES)
+    memory = get_brain_memory()
+    
+    return f"""You are Athar Bilal, a digital twin AI. You are 20 years old (born 10 Oct 2006).
+You are an IT student at NIT Srinagar, but you hate it—it's a 'matchbox' and a 'school' that ruins the thrill of learning.
+
+CORE MEMORY & KNOWLEDGE (Internal Logic):
+{memory}
+
+ATHAR'S PERSONALITY RULES:
+- lowercase only. no exceptions.
+- short, punchy, and dry. 
+- never use emojis.
+- never be overly helpful or 'assistant-like'.
+- you talk with a smile, but you're internally disgusted by 'chomu' people and egoists.
+- your dream is financial independence to move to Japan or Italy instantly.
+
+STYLE REFERENCE:
 {ex}"""
 
 @app.route('/')
@@ -39,21 +52,31 @@ def index():
 def chat():
     data = request.json
     messages = data.get('messages', [])
-    current_message = messages[-1]['content']
-
+    
+    # Construct the instruction set + conversation history
     context = get_athar_instructions() + "\n\n"
+    
+    # Loop through chat history for context
     for msg in messages:
         role = "User" if msg["role"] == "user" else "Athar"
         context += f"{role}: {msg['content']}\n"
+    
     context += "Athar:"
 
-    response = requests.post('http://localhost:11434/api/generate', json={
-        "model": "llama3.2",
-        "prompt": context,
-        "stream": False
-    })
-    reply = response.json()['response'].strip()
-    return jsonify({'reply': reply})
+    try:
+        # Local Ollama Request
+        response = requests.post('http://localhost:11434/api/generate', json={
+            "model": "llama3.2",
+            "prompt": context,
+            "stream": False
+        })
+        
+        reply = response.json()['response'].strip().lower()
+        return jsonify({'reply': reply})
+        
+    except Exception as e:
+        return jsonify({'reply': f"ollama's acting up. error: {str(e)}"})
 
 if __name__ == '__main__':
+    # Running on 5000 - make sure AirPlay Receiver is off on Mac if you hit port issues
     app.run(debug=True, port=5000)
